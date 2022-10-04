@@ -1,16 +1,26 @@
-import dataObj from "./data.json" assert {type: 'json'};
-let data = dataObj
 
 const commentContainer = document.querySelector('.comments-container');
 const inputContainer = document.querySelector('.input-container');
 const modal = document.getElementById('modal-container');
-const currentUserName = data.currentUser.username;
-const currentUserImg = data.currentUser.image.png;
-let count = 4; // id used for new comment
+let count = 4; // incrementing ids used for new comments
+let data
+let currentUserName
+let currentUserImg
+
+async function fetchData() {
+    const response = await fetch('./data.json');
+    const obj = await response.json();
+    data = obj
+    currentUserName = data.currentUser.username;
+    currentUserImg = data.currentUser.image.png;
+    initialise()
+  }
+
+fetchData()
 
 function renderComments(){
     commentContainer.innerHTML = ''; 
-    data.comments.sort((b, a) => a.score - b.score); // sort comments by rating
+    data.comments.sort((a, b) => b.score - a.score); // sort comments by rating
     data.comments.forEach(comment => {
     commentContainer.innerHTML += 
     getCommentHtml('comment',comment ,comment.user.username === currentUserName)
@@ -24,20 +34,26 @@ function renderComments(){
         }
     });
 
-    addEventListeners()
-    saveToLocalStorage(data)
+    addEventListeners() // add listeners after new buttons rendered
+    saveToLocalStorage(data) // save updated data file to localStorage
 }
 
 function initialise(){
     const ls = localStorage.getItem('data')
-    data = ls?JSON.parse(ls):data;
+    data = ls?JSON.parse(ls):data; // overwrite data object with localStorage version if it exists
     inputContainer.innerHTML = getInputHtml('comment', currentUserImg)
     renderComments()
+
+    document.getElementById('add-comment-btn').addEventListener('click',(e)=>{
+        addNewComment(document.getElementById('user-input').value);
+        renderComments();
+        document.getElementById('user-input').value = '';
+    });
 }
 
-initialise()
 
 function getInputHtml(type,currentUserImg,to){
+    console.log('get inuput html')
     return `
         <div class="new-${type === 'reply'?'reply':'comment'}-input">
             <img src="${currentUserImg}" class="user-image"/>
@@ -162,7 +178,7 @@ function addReply(text, to, id){
           "username": currentUserName
         }
     }
-    data.comments.forEach(comment => {
+    data.comments.forEach(comment => { //add reply to comments or replies array
         if(comment.id === id){
             comment.replies.push(newReply)
         }   else if (comment.replies.length > 0) {
@@ -175,7 +191,7 @@ function addReply(text, to, id){
         }
     )}
 
-function editComment(id, text) {
+function editComment(id, text) { 
 data.comments = data.comments.map(comment => {
     if(comment.replies.length === 0 && comment.id != id){   
         return comment
@@ -220,17 +236,20 @@ function addEventListeners () {
         postReply()
     }));
 
+    // delete comment button
     [...document.querySelectorAll('.header-delete')].forEach(el=>el.addEventListener('click',(e)=>{
         toggleModal(Number(e.target.closest('.comment').id))
         }
     ));
 
+    // up/down vote button
     [...document.querySelectorAll('.comment-rating .icon')].forEach(el=>el.addEventListener('click',(e)=>{
        let commentId = Number(e.target.closest('.comment').id);
        if(e.target.className.includes('score-plus')){updateVote(commentId,1)}
        if(e.target.className.includes('score-minus')){updateVote(commentId,-1)}
     }));
 
+    // edit comment button
     [...document.querySelectorAll('.header-edit')].forEach(el=>el.addEventListener('click',(e)=>{        
         editCommentHtml(e.target.closest('.comment').id)
         }
@@ -238,14 +257,8 @@ function addEventListeners () {
 
 }
 
-document.getElementById('add-comment-btn').addEventListener('click',(e)=>{
-    addNewComment(document.getElementById('user-input').value);
-    renderComments();
-    document.getElementById('user-input').value = '';
-});
-
+//modal options
 document.getElementById('cancel-btn').addEventListener('click',toggleModal);
-
 document.getElementById('delete-btn').addEventListener('click',(e)=>{
     deleteComment(Number(modal.dataset.refid))
     toggleModal();
