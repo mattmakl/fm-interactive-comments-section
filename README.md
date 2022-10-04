@@ -37,8 +37,8 @@ Users should be able to:
 
 ### Links
 
-- Solution URL: [Add solution URL here](https://your-solution-url.com)
-- Live Site URL: [Add live site URL here](https://your-live-site-url.com)
+- Solution URL: [Github Repo](https://github.com/mattmakl/fm-interactive-comments-section)
+- Live Site URL: [Github Pages](https://github.com/mattmakl/fm-interactive-comments-section)
 
 ## My process
 
@@ -51,9 +51,11 @@ Users should be able to:
 
 ### What I learned
 
+I initially used 'import' for the JSON data before realising Firefox didn't support it as standard. Brushed up on fetch using async/await. I had to then move a few functions/calls around to ensure things were in the correct order. 
+
 ### Continued development
 
-While I didn't find any single part too difficult, by adding each bit of funcionality incrimentally, it feels a little cluttered/inefficient as a whole. I think I need to work on planning things a bit more up frony befoe diving in.
+While I didn't find any single part too difficult, by adding each bit of funcionality incrimentally, the result feels a little cluttered and potentially inefficient as a whole..?. I think I need to work on planning things a bit more up front before diving in. It may have been a better project to use React for, or at least tidy up the JS file by splitting it up.
 
 ## Author
 
